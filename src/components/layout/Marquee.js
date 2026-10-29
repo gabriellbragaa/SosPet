@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, Easing, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { colors, DISPLAY } from '../../theme';
 import { MARQUEE_WORDS } from '../../config/constants';
 
@@ -18,31 +18,41 @@ function Group() {
 export default function Marquee() {
   const x = useRef(new Animated.Value(0)).current;
   const [groupWidth, setGroupWidth] = useState(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
+  const { width } = useWindowDimensions();
+  const copies = groupWidth ? Math.ceil(width / groupWidth) + 1 : 2;
 
   useEffect(() => {
-    if (!groupWidth) return undefined;
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    return () => sub?.remove?.();
+  }, []);
+
+  useEffect(() => {
+    if (!groupWidth || reduceMotion) return undefined;
     x.setValue(0);
     const loop = Animated.loop(
       Animated.timing(x, { toValue: -groupWidth, duration: 14000, easing: Easing.linear, useNativeDriver: true })
     );
     loop.start();
     return () => loop.stop();
-  }, [groupWidth, x]);
+  }, [groupWidth, reduceMotion, x]);
 
   return (
-    <View style={styles.band}>
+    <View style={styles.band} accessible accessibilityLabel={MARQUEE_WORDS.join(', ')}>
       <Animated.View style={{ flexDirection: 'row', transform: [{ translateX: x }] }}>
         <View onLayout={(e) => !groupWidth && setGroupWidth(e.nativeEvent.layout.width)}>
           <Group />
         </View>
-        <Group />
-        <Group />
+        {Array.from({ length: copies }, (_, i) => (
+          <Group key={i} />
+        ))}
       </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  band: { backgroundColor: colors.red, paddingVertical: 8, overflow: 'hidden', transform: [{ rotate: '-1deg' }] },
-  text: { color: colors.white, fontFamily: DISPLAY, fontWeight: '700', fontSize: 15 },
+  band: { backgroundColor: colors.red, paddingVertical: 12, marginHorizontal: -24, overflow: 'hidden', transform: [{ rotate: '-1deg' }] },
+  text: { color: colors.white, fontFamily: DISPLAY, fontSize: 22 },
 });

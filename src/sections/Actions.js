@@ -1,47 +1,75 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../theme';
+import { colors, BODY } from '../theme';
 import { images } from '../assets/images';
 import Photo from '../components/common/Photo';
+import Section from '../components/layout/Section';
 import { Eyebrow, Heading } from '../components/common/Typography';
+import useBreakpoint from '../hooks/useBreakpoint';
 
 const ACTIONS = [
-  { id: 'comida', image: images.acao1, emoji: '🍲', bg: colors.cream, color: colors.brown, text: 'Ajude a garantir comida para animais resgatados.' },
-  { id: 'lar', image: images.acao2, emoji: '🏠', bg: colors.brown, color: colors.cream, text: 'Contribua para que eles possam se recuperar e encontrar um novo lar.' },
-  { id: 'saude', image: images.acao3, emoji: '💊', bg: colors.cream, color: colors.brown, text: 'Contribua para consultas, medicamentos e procedimentos.' },
+  { id: 'comida', image: images.acao1, emoji: '🍲', bg: colors.cream, color: colors.brown, alt: 'Comedouro em rota de alimentação', text: 'Garante ração nas rotas de alimentação, que percorrem a cidade todos os dias.' },
+  { id: 'resgate', image: images.acao2, emoji: '🚑', bg: colors.brown, color: colors.cream, alt: 'Cachorro resgatado se recuperando', text: 'Ajuda nos resgates e na recuperação de animais em situação grave.' },
+  { id: 'saude', image: images.acao3, emoji: '💊', bg: colors.cream, color: colors.brown, alt: 'Cachorro em atendimento veterinário', text: 'Contribui para consultas, medicamentos, antiparasitários e castrações.' },
 ];
 
 export default function Actions() {
-  return (
-    <View style={styles.wrap}>
-      <Eyebrow>PARA ONDE VAI SUA AJUDA</Eyebrow>
+  const { isDesktop, isTablet } = useBreakpoint();
 
+  return (
+    <Section bg={colors.white} style={[styles.band, isDesktop && styles.bandDesktop]}>
       <View style={styles.titleRow}>
-        <View>
-          <Heading>SUA DOAÇÃO VIRA</Heading>
-          <Heading style={{ color: colors.red }}>CUIDADO.</Heading>
+        <View style={{ flexShrink: 1 }}>
+          <Eyebrow>PARA ONDE VAI SUA AJUDA</Eyebrow>
+          <Heading>
+            SUA DOAÇÃO VIRA <Text style={{ color: colors.red }}>CUIDADO.</Text>
+          </Heading>
         </View>
-        <Photo source={images.mascote} style={styles.mascot} emoji="🐕" bg="transparent" />
+        <Photo
+          source={images.mascote}
+          style={[styles.mascot, isDesktop && styles.mascotDesktop]}
+          emoji="🐕"
+          bg="transparent"
+        />
       </View>
 
-      <View style={styles.list}>
-        {ACTIONS.map((a) => (
-          <View key={a.id} style={[styles.card, { backgroundColor: a.bg }]}>
-            <Photo source={a.image} style={styles.image} emoji={a.emoji} bg="#E8D5BF" />
+      <View style={[styles.list, isTablet && styles.listRow]}>
+        {ACTIONS.map((a, i) => (
+          <View
+            key={a.id}
+            style={[
+              styles.card,
+              { backgroundColor: a.bg },
+              isTablet && styles.cardRow,
+              isDesktop && i === 1 && { transform: [{ translateY: 24 }] },
+            ]}
+          >
+            <Photo
+              source={a.image}
+              style={[styles.image, isDesktop && styles.imageDesktop]}
+              emoji={a.emoji}
+              bg={colors.photoBg}
+              alt={a.alt}
+            />
             <Text style={[styles.text, { color: a.color }]}>{a.text}</Text>
           </View>
         ))}
       </View>
-    </View>
+    </Section>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: { backgroundColor: colors.white, paddingHorizontal: 16, paddingVertical: 24, borderTopLeftRadius: 28, borderTopRightRadius: 28, marginTop: 12 },
-  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
+  band: { borderTopLeftRadius: 28, borderTopRightRadius: 28 },
+  bandDesktop: { borderTopLeftRadius: 56, borderTopRightRadius: 56, paddingBottom: 112 },
+  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16 },
   mascot: { width: 90, height: 90, borderRadius: 45 },
-  list: { marginTop: 20, gap: 14 },
-  card: { borderRadius: 14, padding: 12, alignItems: 'center' },
-  image: { width: '100%', height: 170, borderRadius: 8 },
-  text: { fontSize: 12, textAlign: 'center', lineHeight: 17, marginTop: 10, paddingHorizontal: 6, fontStyle: 'italic' },
+  mascotDesktop: { width: 130, height: 130, borderRadius: 65 },
+  list: { marginTop: 24, gap: 16 },
+  listRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  card: { borderRadius: 24, padding: 12, paddingBottom: 20, alignItems: 'center' },
+  cardRow: { flex: 1 },
+  image: { width: '100%', height: 200, borderRadius: 16 },
+  imageDesktop: { height: 280 },
+  text: { fontFamily: BODY, fontSize: 16, textAlign: 'center', lineHeight: 24, marginTop: 14, paddingHorizontal: 10 },
 });

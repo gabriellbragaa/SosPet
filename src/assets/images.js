@@ -14,4 +14,9 @@ export const images = {
   avatar2: null,
   avatar3: null,
   qrcode: null,
+  historiaFundadoras: null, // Inelsa e Ieline
+  aisha: null, // foto da Aisha
+  historiaLares: null, // garagem / casas das voluntárias
+  historiaRotas: null, // rota de alimentação
+  historiaCastracao: null, // mutirão do Castramóvel
 };

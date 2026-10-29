@@ -1,32 +1,50 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors, DISPLAY } from '../theme';
+import { colors, DISPLAY, BODY_MEDIUM } from '../theme';
 import { STATS } from '../config/constants';
+import Section from '../components/layout/Section';
+import useBreakpoint from '../hooks/useBreakpoint';
 
 export default function Stats() {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.title}>
-        Juntos, já <Text style={{ color: colors.orange }}>conseguimos:</Text>
-      </Text>
+  const { isDesktop } = useBreakpoint();
 
-      <View style={styles.grid}>
-        {STATS.map((stat) => (
-          <View key={stat.id} style={[styles.item, stat.highlight && { backgroundColor: colors.orange }]}>
-            <Text style={[styles.value, stat.highlight && { color: colors.dark }]}>{stat.value}</Text>
-            <Text style={[styles.label, stat.highlight && { color: colors.dark }]}>{stat.label}</Text>
-          </View>
-        ))}
+  return (
+    <Section bg={colors.cream} style={{ paddingBottom: 0 }}>
+      <View style={[styles.card, isDesktop && styles.cardDesktop]}>
+        <Text style={[styles.title, isDesktop && styles.titleDesktop]} accessibilityRole="header">
+          Juntos, já <Text style={{ color: colors.orange }}>conseguimos:</Text>
+        </Text>
+
+        <View style={styles.grid}>
+          {STATS.map((stat) => (
+            <View
+              key={stat.id}
+              style={[
+                styles.item,
+                { flexBasis: isDesktop ? '22%' : '45%' },
+                stat.highlight && { backgroundColor: colors.orange },
+              ]}
+            >
+              <Text style={[styles.value, isDesktop && styles.valueDesktop, stat.highlight && { color: colors.dark }]}>
+                {stat.value}
+              </Text>
+              <Text style={[styles.label, stat.highlight && { color: colors.dark }]}>{stat.label}</Text>
+            </View>
+          ))}
+        </View>
       </View>
-    </View>
+    </Section>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.dark, borderRadius: 24, margin: 16, marginTop: 28, padding: 20 },
-  title: { fontFamily: DISPLAY, color: colors.white, fontSize: 26, fontWeight: '700', marginBottom: 14 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  item: { width: '48%', flexGrow: 1, backgroundColor: '#333', borderRadius: 14, padding: 14 },
-  value: { color: colors.white, fontFamily: DISPLAY, fontSize: 28, fontWeight: '700' },
-  label: { color: '#DDD', fontSize: 10, fontWeight: '700', marginTop: 4 },
+  card: { backgroundColor: colors.dark, borderRadius: 24, padding: 20 },
+  cardDesktop: { borderRadius: 36, paddingVertical: 48, paddingHorizontal: 44 },
+  title: { fontFamily: DISPLAY, color: colors.white, fontSize: 32, lineHeight: 36, marginBottom: 16 },
+  titleDesktop: { fontSize: 52, lineHeight: 56, marginBottom: 28 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  item: { flexGrow: 1, backgroundColor: colors.darkCard, borderRadius: 18, padding: 18, minHeight: 120, justifyContent: 'space-between' },
+  value: { color: colors.white, fontFamily: DISPLAY, fontSize: 38, lineHeight: 42 },
+  valueDesktop: { fontSize: 60, lineHeight: 62 },
+  label: { fontFamily: BODY_MEDIUM, color: colors.onDark, fontSize: 14, lineHeight: 19, marginTop: 6 },
 });
